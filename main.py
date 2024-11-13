@@ -1,8 +1,5 @@
 import sqlite3
 import tkinter
-from tkinter import *
-from tkinter import Tk, font
-from tkinter import ttk
 from time import strftime
 import datetime
 from tkinter import messagebox as mb
@@ -17,16 +14,16 @@ cursor.execute(
     "CREATE TABLE IF NOT EXISTS Vendas (iD INTEGER PRIMARY KEY, nomeVenda TEXT, qtde INTEGER, precoTotal REAL, data TEXT)")
 
 
-def telaInicial():
+def tela_inicial():
     global telaInicio
     telaInicio = tkinter.Tk()
     telaInicio.title("Inicio")
     telaInicio.resizable(False, False)
     telaInicio.focus_force()
-    
-    bg = PhotoImage(file = "Projetos\Sistema de Estoque\wallpaper.png") 
-    label1 = Label(telaInicio, image = bg) 
-    label1.place(x = 0,y = 0) 
+
+    bg = PhotoImage(file = "Projetos\Sistema de Estoque\wallpaper.png")
+    label1 = Label(telaInicio, image = bg)
+    label1.place(x = 0,y = 0)
 
 
     label = tkinter.Label(
@@ -42,15 +39,15 @@ def telaInicial():
     label1.grid(row=1, column=1, pady=10, padx=47)
 
     button_vender = tkinter.Button(telaInicio, text="Área de Vendas",
-                                   font="Consolas 10", bg="#6B58FF", fg="white", command=telaFinanceiro)
+                                   font="Consolas 10", bg="#6B58FF", fg="white", command=tela_financeiro)
     button_vender.grid(row=2, column=1, padx=20, pady=10, sticky='ew')
 
     button = tkinter.Button(telaInicio, text="Adicionar Novo Produto",
-                            font="Consolas 10", bg="#3D8EF0", fg="white", command=telaAddProd)
+                            font="Consolas 10", bg="#3D8EF0", fg="white", command=tela_add_produto)
     button.grid(row=3, column=1, padx=20, pady=10, sticky='ew')
 
     botao_prova = tkinter.Button(
-        telaInicio, text="Editar Produtos", font="Consolas 10", bg="#1CB9E4", fg="white", command=telaEditProd)
+        telaInicio, text="Editar Produtos", font="Consolas 10", bg="#1CB9E4", fg="white", command=tela_edit_produto)
     botao_prova.grid(row=4, column=1, padx=20, pady=10, sticky='ew')
 
     cursor.execute("SELECT COUNT(*) FROM Produtos WHERE qtde < 5")
@@ -58,17 +55,17 @@ def telaInicial():
 
     if baixo_estoque_count > 0:
         botao_tabela = tkinter.Button(
-            telaInicio, text="Exibir Estoque ⚠️", font="Consolas 10 bold", bg="#0AB4B5", fg="#75163F", command=selectProd)
+            telaInicio, text="Exibir Estoque ⚠️", font="Consolas 10 bold", bg="#0AB4B5", fg="#75163F", command=select_produto)
     else:
         botao_tabela = tkinter.Button(
-            telaInicio, text="Exibir Estoque", font="Consolas 10", bg="#0AB4B5", fg="white", command=selectProd)
+            telaInicio, text="Exibir Estoque", font="Consolas 10", bg="#0AB4B5", fg="white", command=select_produto)
 
     botao_tabela.grid(row=5, column=1, padx=20, pady=10, sticky='ew')
 
     button = tkinter.Button(telaInicio, text="Sair do Programa", font="Consolas 10",
                             bg="#4A2ED1", fg="white", command=telaInicio.destroy)
     button.grid(row=6, column=1, padx=170, pady=50)
-    
+
     label_hora = tkinter.Label(telaInicio, font="Consolas 10")
     label_hora.grid(row=7, column=1, padx=10, sticky='e')
 
@@ -82,7 +79,7 @@ def telaInicial():
     telaInicio.mainloop()
 
 
-def telaFinanceiro():
+def tela_financeiro():
     telaInicio.withdraw()
 
     global janelaVendas
@@ -90,7 +87,7 @@ def telaFinanceiro():
     janelaVendas.resizable(False, False)
     janelaVendas.geometry("325x520")
     janelaVendas.title("Área de Vendas")
-    
+
     label = tkinter.Label(
         janelaVendas, text="Área Financeira", font="Consolas 13 bold")
     label.grid(row=0, column=0, pady=10, sticky='ew')
@@ -104,11 +101,11 @@ def telaFinanceiro():
     label_imagem.image = imagem
 
     botao_vender = tkinter.Button(
-        janelaVendas, text="Realizar uma Venda", bg="#6B58FF", fg="white", command=telaVenderProd)
+        janelaVendas, text="Realizar uma Venda", bg="#6B58FF", fg="white", command=tela_vender_prod)
     botao_vender.grid(row=2, column=0, padx=10, pady=10, sticky='ew')
 
     botao_consulta = tkinter.Button(
-        janelaVendas, text="Consultar Vendas", bg="#3D8EF0", fg="white", command=exibirVendas)
+        janelaVendas, text="Consultar Vendas", bg="#3D8EF0", fg="white", command=exibir_vendas)
     botao_consulta.grid(row=3, column=0, padx=10, pady=10, sticky='ew')
 
     botao_voltar = tkinter.Button(janelaVendas, text="Voltar para Tela Inicial",
@@ -116,22 +113,22 @@ def telaFinanceiro():
     botao_voltar.grid(row=4, column=0, padx=100, pady=10, sticky='ew')
 
 
-def telaVenderProd():
+def tela_vender_prod():
     janelaVendas.withdraw()
 
-    rootVender = tkinter.Tk()
-    rootVender.resizable(False, False)
-    rootVender.title("Vender Produto")
-    rootVender.geometry("445x440")
+    root_vender = tkinter.Tk()
+    root_vender.resizable(False, False)
+    root_vender.title("Vender Produto")
+    root_vender.geometry("445x440")
 
     label = tkinter.Label(
-        rootVender, text="Selecione o Produto que deseja Vender", font="Consolas 13 bold")
+        root_vender, text="Selecione o Produto que deseja Vender", font="Consolas 13 bold")
     label.grid(row=0, column=0, pady=10, sticky='ew')
 
     cursor.execute("SELECT * FROM Produtos")
     dados = cursor.fetchall()
 
-    tabela = tkinter.Frame(rootVender)
+    tabela = tkinter.Frame(root_vender)
     tabela.grid(row=1, column=0, padx=10, pady=10)
 
     tv = tkinter.ttk.Treeview(tabela, columns=(
@@ -162,7 +159,7 @@ def telaVenderProd():
     tv.tag_configure("baixo_estoque", foreground="#EB3324")
     tv.pack()
 
-    def venderProduto():
+    def vender_produto():
         item_selecionado = tv.selection()
         if item_selecionado:
             item = tv.item(item_selecionado)
@@ -182,14 +179,14 @@ def telaVenderProd():
                 label_nome = tkinter.Label(
                     vender_janela, text="Nome:", font="Consolas 10")
                 label_nome.grid(row=1, column=0, padx=10, pady=15, sticky='ew')
-                textoNome = tkinter.StringVar(value=produto[1])
-                nome = tkinter.Entry(vender_janela, textvariable=textoNome)
+                texto_nome = tkinter.StringVar(value=produto[1])
+                nome = tkinter.Entry(vender_janela, textvariable=texto_nome)
                 nome.grid(row=1, column=1, padx=8, pady=15, sticky='ew')
                 label_qtde = tkinter.Label(
                     vender_janela, text="Qtde:", font="Consolas 10")
                 label_qtde.grid(row=2, column=0, padx=10, pady=15, sticky='ew')
-                textoQtde = tkinter.StringVar(value=1)
-                qtde = tkinter.Entry(vender_janela, textvariable=textoQtde)
+                texto_qtde = tkinter.StringVar(value=1)
+                qtde = tkinter.Entry(vender_janela, textvariable=texto_qtde)
                 qtde.grid(row=2, column=1, padx=8, pady=15, sticky='ew')
 
                 def calcular_preco_total():
@@ -198,8 +195,8 @@ def telaVenderProd():
                         text="R$ {:.2f}".format(produto[3] * nova_qtde))
 
                 def aumentar_quantidade():
-                    nova_quantidade = int(textoQtde.get()) + 1
-                    textoQtde.set(nova_quantidade)
+                    nova_quantidade = int(texto_qtde.get()) + 1
+                    texto_qtde.set(nova_quantidade)
                     calcular_preco_total()
 
                 botao_aumentar = tkinter.Button(
@@ -241,9 +238,9 @@ def telaVenderProd():
                             mb.showinfo(
                                 "Sucesso", f"Venda realizada com sucesso! Preço total: {preco_total.cget('text')}")
                             vender_janela.destroy()
-                            rootVender.destroy()
+                            root_vender.destroy()
                             telaInicio.destroy()
-                            telaInicial()
+                            tela_inicial()
                     else:
                         mb.showerror(
                             "Erro", "Quantidade insuficiente em estoque.")
@@ -259,27 +256,27 @@ def telaVenderProd():
                                   pady=10, sticky='ew')
 
     botao_vender = tkinter.Button(
-        rootVender, text="Vender Produto", bg="#6B58FF", fg="white", command=venderProduto)
+        root_vender, text="Vender Produto", bg="#6B58FF", fg="white", command=vender_produto)
     botao_vender.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
     botao_voltar = tkinter.Button(
-        rootVender, text="Voltar", bg="#3D8EF0", fg="white", command=lambda: [rootVender.destroy(), janelaVendas.deiconify()])
+        root_vender, text="Voltar", bg="#3D8EF0", fg="white", command=lambda: [root_vender.destroy(), janelaVendas.deiconify()])
     botao_voltar.grid(row=3, column=0, padx=20, pady=10, sticky='ew')
 
-def exibirVendas():
-    rootConsulta = tkinter.Tk()
-    rootConsulta.resizable(False, False)
-    rootConsulta.title("Vendas")
-    rootConsulta.geometry("562x400")
+def exibir_vendas():
+    root_consulta = tkinter.Tk()
+    root_consulta.resizable(False, False)
+    root_consulta.title("Vendas")
+    root_consulta.geometry("562x400")
 
     label = tkinter.Label(
-        rootConsulta, text="Histórico de Vendas", font="Consolas 13 bold")
+        root_consulta, text="Histórico de Vendas", font="Consolas 13 bold")
     label.grid(row=0, column=0, pady=10, sticky='ew')
 
     cursor.execute("SELECT * FROM Vendas")
     vendas_data = cursor.fetchall()
 
-    tabela = tkinter.Frame(rootConsulta)
+    tabela = tkinter.Frame(root_consulta)
     tabela.grid(row=1, column=0, padx=10, pady=10)
 
     tv = tkinter.ttk.Treeview(tabela, columns=(
@@ -299,17 +296,16 @@ def exibirVendas():
 
     tv.pack()
     botao_fechar = tkinter.Button(
-        rootConsulta, text="Voltar", bg="#6B58FF", fg="white", command=rootConsulta.destroy)
+        root_consulta, text="Voltar", bg="#6B58FF", fg="white", command=root_consulta.destroy)
     botao_fechar.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
-def telaAddProd():
+def tela_add_produto():
     global janelaAdd
 
     janelaAdd = tkinter.Tk()
     janelaAdd.resizable(False, False)
     janelaAdd.geometry("435x320")
     janelaAdd.title("Cadastro de Produtos")
-    
     centralizar_janela(janelaAdd)
 
     label = tkinter.Label(
@@ -318,31 +314,31 @@ def telaAddProd():
 
     label_nome = tkinter.Label(janelaAdd, text="Nome:", font="Consolas 10")
     label_nome.grid(row=1, column=0, padx=10, pady=15, sticky='ew')
-    textoNome = tkinter.StringVar()
-    nome = tkinter.Entry(janelaAdd, textvariable=textoNome)
+    texto_nome = tkinter.StringVar()
+    nome = tkinter.Entry(janelaAdd, textvariable=texto_nome)
     nome.grid(row=1, column=1, padx=8, pady=15, sticky='ew')
 
     label_qtde = tkinter.Label(janelaAdd, text="Qtde:", font="Consolas 10")
     label_qtde.grid(row=2, column=0, padx=10, pady=15, sticky='ew')
-    textoQtde = tkinter.StringVar()
-    qtde = tkinter.Entry(janelaAdd, textvariable=textoQtde)
+    texto_qtde = tkinter.StringVar()
+    qtde = tkinter.Entry(janelaAdd, textvariable=texto_qtde)
     qtde.grid(row=2, column=1, padx=8, pady=15, sticky='ew')
 
     label_preco = tkinter.Label(janelaAdd, text="Preço:", font="Consolas 10")
     label_preco.grid(row=3, column=0, padx=10, pady=15, sticky='ew')
-    textopreco = tkinter.StringVar()
-    preco = tkinter.Entry(janelaAdd, textvariable=textopreco)
+    texto_preco = tkinter.StringVar()
+    preco = tkinter.Entry(janelaAdd, textvariable=texto_preco)
     preco.grid(row=3, column=1, padx=8, pady=15, sticky='ew')
 
     botao_add = tkinter.Button(janelaAdd, text="Concluir", bg="#6B58FF",
-                               fg="white", command=lambda: addProd(nome.get(), qtde.get(), preco.get()))
+                               fg="white", command=lambda: add_produto(nome.get(), qtde.get(), preco.get()))
     botao_add.grid(row=4, column=1, padx=10, pady=10, sticky='ew')
 
     botao_voltar = tkinter.Button(janelaAdd, text="Voltar para Tela Inicial", bg="#3D8EF0", fg="white", command=lambda: [
-                                  janelaAdd.destroy(), telaInicio.destroy(), telaInicial()])
+                                  janelaAdd.destroy(), telaInicio.destroy(), tela_inicial()])
     botao_voltar.grid(row=5, column=1, padx=100, pady=10, sticky='ew')
 
-    def addProd(nome, qtde, preco):
+    def add_produto(nome, qtde, preco):
         janelaAdd.destroy()
 
         try:
@@ -354,31 +350,31 @@ def telaAddProd():
         except ValueError:
             mb.showerror(
                 "Erro", "Por favor, insira uma quantidade e preço válidos.")
-            telaAddProd()
+            tela_add_produto()
             return
 
         mb.showinfo(
             "Sucesso", f"'{nome}'({qtde}) Adicionado ao Estoque .")
 
         if mb.askyesno("Adicionar outro produto", "Deseja adicionar outro produto?"):
-            telaAddProd()
+            tela_add_produto()
 
 
-def telaEditProd():
+def tela_edit_produto():
 
-    rootEdit = tkinter.Tk()
-    rootEdit.resizable(False, False)
-    rootEdit.title("Editar Produto")
-    rootEdit.geometry("445x440")
+    root_edit = tkinter.Tk()
+    root_edit.resizable(False, False)
+    root_edit.title("Editar Produto")
+    root_edit.geometry("445x440")
 
     label = tkinter.Label(
-        rootEdit, text="Selecione o Produto que deseja Editar", font="Consolas 13 bold")
+        root_edit, text="Selecione o Produto que deseja Editar", font="Consolas 13 bold")
     label.grid(row=0, column=0, pady=10, sticky='ew')
 
     cursor.execute("SELECT * FROM Produtos")
     dados = cursor.fetchall()
 
-    tabela = tkinter.Frame(rootEdit)
+    tabela = tkinter.Frame(root_edit)
     tabela.grid(row=1, column=0, padx=10, pady=10)
 
     tv = tkinter.ttk.Treeview(tabela, columns=(
@@ -410,7 +406,7 @@ def telaEditProd():
 
     tv.pack()
 
-    def editarProduto():
+    def editar_produto():
         item_selecionado = tv.selection()
         if item_selecionado:
             item = tv.item(item_selecionado)
@@ -432,23 +428,23 @@ def telaEditProd():
                 label_nome = tkinter.Label(
                     editar_janela, text="Nome:", font="Consolas 10")
                 label_nome.grid(row=1, column=0, padx=10, pady=15, sticky='ew')
-                textoNome = tkinter.StringVar(value=produto[1])
-                nome = tkinter.Entry(editar_janela, textvariable=textoNome)
+                texto_nome = tkinter.StringVar(value=produto[1])
+                nome = tkinter.Entry(editar_janela, textvariable=texto_nome)
                 nome.grid(row=1, column=1, padx=8, pady=15, sticky='ew')
 
                 label_qtde = tkinter.Label(
                     editar_janela, text="Qtde:", font="Consolas 10")
                 label_qtde.grid(row=2, column=0, padx=10, pady=15, sticky='ew')
-                textoQtde = tkinter.StringVar(value=produto[2])
-                qtde = tkinter.Entry(editar_janela, textvariable=textoQtde)
+                texto_qtde = tkinter.StringVar(value=produto[2])
+                qtde = tkinter.Entry(editar_janela, textvariable=texto_qtde)
                 qtde.grid(row=2, column=1, padx=8, pady=15, sticky='ew')
 
                 label_preco = tkinter.Label(
                     editar_janela, text="Preço:", font="Consolas 10")
                 label_preco.grid(row=3, column=0, padx=10,
                                  pady=15, sticky='ew')
-                textoPreco = tkinter.StringVar(value=produto[3])
-                preco = tkinter.Entry(editar_janela, textvariable=textoPreco)
+                texto_preco = tkinter.StringVar(value=produto[3])
+                preco = tkinter.Entry(editar_janela, textvariable=texto_preco)
                 preco.grid(row=3, column=1, padx=8, pady=15, sticky='ew')
 
                 def salvar_edicao():
@@ -466,10 +462,10 @@ def telaEditProd():
                         mb.showinfo(
                             "Sucesso", "Produto atualizado com sucesso!")
                         editar_janela.destroy()
-                        rootEdit.destroy()
+                        root_edit.destroy()
 
                         telaInicio.destroy()
-                        telaInicial()
+                        tela_inicial()
                     except ValueError:
                         mb.showerror(
                             "Erro", "Por favor, insira uma quantidade e preço válidos.")
@@ -484,7 +480,7 @@ def telaEditProd():
                 botao_voltar.grid(row=5, column=1, padx=20,
                                   pady=10, sticky='ew')
 
-    def deletarProd():
+    def deletar_produto():
 
         itens_selecionados = tv.selection()
 
@@ -503,37 +499,37 @@ def telaEditProd():
                         "DELETE FROM Produtos WHERE iD=?", (id_produto,))
 
                 connection.commit()
-                rootEdit.destroy()
+                root_edit.destroy()
                 telaInicio.destroy()
-                telaInicial()
+                tela_inicial()
 
     botao_editar = tkinter.Button(
-        rootEdit, text="Editar", bg="#6B58FF", fg="white", command=editarProduto)
+        root_edit, text="Editar", bg="#6B58FF", fg="white", command=editar_produto)
     botao_editar.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
     botao_deletar = tkinter.Button(
-        rootEdit, text="Deletar", bg="#3D8EF0", fg="white", command=deletarProd)
+        root_edit, text="Deletar", bg="#3D8EF0", fg="white", command=deletar_produto)
     botao_deletar.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
 
     botao_fechar = tkinter.Button(
-        rootEdit, text="Voltar", bg="#1CB9E4", fg="white", command=rootEdit.destroy)
+        root_edit, text="Voltar", bg="#1CB9E4", fg="white", command=root_edit.destroy)
     botao_fechar.grid(row=4, column=0, padx=50, pady=10, sticky="ew")
 
 
-def selectProd():
-    rootSelect = tkinter.Tk()
-    rootSelect.resizable(False, False)
-    rootSelect.title("Tabela de Produtos")
-    rootSelect.geometry("622x400")
+def select_produto():
+    root_select = tkinter.Tk()
+    root_select.resizable(False, False)
+    root_select.title("Tabela de Produtos")
+    root_select.geometry("622x400")
 
     label = tkinter.Label(
-        rootSelect, text="Estoque dos Produtos", font="Consolas 13 bold")
+        root_select, text="Estoque dos Produtos", font="Consolas 13 bold")
     label.grid(row=0, column=0, pady=10, sticky='ew')
 
     cursor.execute("SELECT * FROM Produtos")
     dados = cursor.fetchall()
 
-    tabela = tkinter.Frame(rootSelect)
+    tabela = tkinter.Frame(root_select)
     tabela.grid(row=1, column=0, padx=10, pady=10)
 
     tv = tkinter.ttk.Treeview(tabela, columns=(
@@ -562,7 +558,7 @@ def selectProd():
 
     tv.pack()
     botao_fechar = tkinter.Button(
-        rootSelect, text="Voltar", bg="#6B58FF", fg="white", command=rootSelect.destroy)
+        root_select, text="Voltar", bg="#6B58FF", fg="white", command=root_select.destroy)
     botao_fechar.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
 def centralizar_janela(janela):
@@ -577,6 +573,6 @@ def centralizar_janela(janela):
 
     janela.geometry(f"+{posicao_x}+{posicao_y}")
 
-telaInicial()
+tela_inicial()
 cursor.execute("SELECT * FROM Vendas")
 connection.commit()
