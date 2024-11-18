@@ -1,3 +1,7 @@
+"""
+Este é o módulo principal do projeto.
+
+"""
 import sqlite3
 import tkinter
 from time import strftime
@@ -31,7 +35,9 @@ cursor.execute(
 )
 
 def tela_inicial():
-
+    """
+    Tela inicial do sistema.
+    """
     global telaInicio
     telaInicio = tkinter.Tk()
     telaInicio.title("Inicio")
@@ -130,8 +136,10 @@ def tela_inicial():
 
 
 def tela_financeiro():
+    """
+    Tela de vendas do sistema.
+    """
     telaInicio.withdraw()
-
     global janelaVendas
     janelaVendas = tkinter.Toplevel()
     janelaVendas.resizable(False, False)
@@ -169,6 +177,9 @@ def tela_financeiro():
     botao_voltar.grid(row=4, column=0, padx=100, pady=10, sticky='ew')
 
 def tela_vender_prod():
+    """
+     Tela de venda de produtos.
+    """
     janelaVendas.withdraw()
     root_vender = tkinter.Tk()
     root_vender.resizable(False, False)
@@ -345,6 +356,9 @@ def tela_vender_prod():
     botao_voltar.grid(row=3, column=0, padx=20, pady=10, sticky='ew')
 
 def exibir_vendas():
+    """
+    Tela de consulta - Histórico de Vendas.
+    """
     root_consulta = tkinter.Tk()
     root_consulta.resizable(False, False)
     root_consulta.title("Vendas")
@@ -381,6 +395,9 @@ def exibir_vendas():
     botao_fechar.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
 def tela_add_produto():
+    """
+    Tela para cadastramento de produtos
+    """
     global janelaAdd
 
     janelaAdd = tkinter.Tk()
@@ -454,9 +471,10 @@ def tela_add_produto():
         if mb.askyesno("Adicionar outro produto", "Deseja adicionar outro produto?"):
             tela_add_produto()
 
-
 def tela_edit_produto():
-
+    """
+    Tela edição/atualização de produtos.
+    """
     root_edit = tkinter.Tk()
     root_edit.resizable(False, False)
     root_edit.title("Editar Produto")
@@ -621,6 +639,9 @@ def tela_edit_produto():
 
 
 def select_produto():
+    """
+    Tela tabela de produtos.
+    """
     root_select = tkinter.Tk()
     root_select.resizable(False, False)
     root_select.title("Tabela de Produtos")
@@ -666,6 +687,9 @@ def select_produto():
     botao_fechar.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
 def centralizar_janela(janela):
+    """
+    Ajuiste de janela - Centralização.
+    """
     largura_janela = janela.winfo_reqwidth()
     altura_janela = janela.winfo_reqheight()
 
