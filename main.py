@@ -4,9 +4,9 @@ Este é o módulo principal do projeto.
 """
 import sqlite3
 import tkinter
+from tkinter import messagebox as mb, Label, PhotoImage
 from time import strftime
 import datetime
-from tkinter import messagebox as mb
 from PIL import Image, ImageTk
 
 app_state = {
@@ -58,7 +58,7 @@ def tela_inicial():
         tela_inicio, text="Bem vindo ao Sistema de Estoque!", font="Consolas 13 bold", bg="#FFFFFF")
     label.grid(row=0, column=1, pady=10, sticky='ew')
 
-    image1 = Image.open(r"Projetos\Sistema de Estoque\logo.png")
+    image1 = Image.open(r"C:\Users\Mayson Medeiros\Documents\GitProjets\QDSW-Sistema-de-Estoque\logo.png")
     width, height = 400, 300
     image1.thumbnail((width, height))
     test = ImageTk.PhotoImage(image1)
@@ -81,7 +81,7 @@ def tela_inicial():
         font="Consolas 10",
         bg="#3D8EF0",
         fg="white",
-        ommand=tela_add_produto
+        command=tela_add_produto
    )
     button.grid(row=3, column=1, padx=20, pady=10, sticky='ew')
 
