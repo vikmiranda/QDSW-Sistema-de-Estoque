@@ -107,13 +107,14 @@ def criar_botao(tela, texto, comando, cor_fundo="#FFFFFF", row=0, **kwargs):
     )
     return botao
 
-def criar_label(tela_inicio, texto, column, row):
+def criar_label(tela_inicio, texto, column, row, imagem=None):
     """Cria um label."""
     label = tkinter.Label(
         tela_inicio,
         text=texto,
         font="Consolas 13 bold",
-        bg="#FFFFFF"
+        bg="#FFFFFF",
+        image=imagem
     )
     label.grid(row=row, column=column, pady=10, sticky='ew')
     return label
@@ -159,8 +160,8 @@ def tela_inicial():
     criar_botao(tela_inicio, "Sair do Programa",
                 tela_inicio.destroy, cor_fundo="#4A2ED1", row=6, padx=170, pady=50)
 
-    label_hora = tkinter.Label(tela_inicio, font="Consolas 10")
-    label_hora.grid(row=7, column=1, padx=10, sticky='e')
+    label_hora = criar_label(tela_inicio,"", column=1, row=7)
+    label_hora.grid(sticky='e')
     atualizar_hora(label_hora, tela_inicio)
 
     tela_inicio.mainloop()
@@ -177,16 +178,13 @@ def tela_financeiro():
     janela_vendas.title("Área de Vendas")
     app_state["janela_vendas"] = janela_vendas
 
-    label = tkinter.Label(
-        janela_vendas, text="Área Financeira", font="Consolas 13 bold")
-    label.grid(row=0, column=0, pady=10, sticky='ew')
+    criar_label(janela_vendas,"Área Financeira", 0, 0)
 
     imagem = Image.open(r"logo2.png")
     width, height = 400, 300
     imagem.thumbnail((width, height))
     imagem = ImageTk.PhotoImage(imagem)
-    label_imagem = tkinter.Label(janela_vendas, image=imagem)
-    label_imagem.grid(row=1, column=0, padx=10, pady=10, sticky='ew')
+    label_imagem = criar_label(janela_vendas, "",row=1, column=0, imagem=imagem)
     label_imagem.image = imagem
 
     botao_vender = tkinter.Button(
@@ -482,10 +480,7 @@ def exibir_vendas():
     root_consulta.resizable(False, False)
     root_consulta.title("Vendas")
     root_consulta.geometry("562x400")
-
-    label = tkinter.Label(
-        root_consulta, text="Histórico de Vendas", font="Consolas 13 bold")
-    label.grid(row=0, column=0, pady=10, sticky='ew')
+    criar_label(root_consulta,"Histórico de Vendas",column=0,row=0)
 
     cursor.execute("SELECT * FROM Vendas")
     vendas_data = cursor.fetchall()
@@ -524,24 +519,18 @@ def tela_add_produto():
     janela_add.title("Cadastro de Produtos")
     centralizar_janela(janela_add)
     app_state["janela_add"] = janela_add
-    label = tkinter.Label(
-        janela_add, text="Preencha os campos a seguir", font="Consolas 13 bold")
-    label.grid(row=0, column=1, pady=10, sticky='ew')
+    criar_label(janela_add, "Preencha os campos a seguir", column=1, row=0)
+    criar_label(janela_add, "Nome:", column=0, row=1)
 
-    label_nome = tkinter.Label(janela_add, text="Nome:", font="Consolas 10")
-    label_nome.grid(row=1, column=0, padx=10, pady=15, sticky='ew')
     texto_nome = tkinter.StringVar()
     nome = tkinter.Entry(janela_add, textvariable=texto_nome)
     nome.grid(row=1, column=1, padx=8, pady=15, sticky='ew')
 
-    label_qtde = tkinter.Label(janela_add, text="Qtde:", font="Consolas 10")
-    label_qtde.grid(row=2, column=0, padx=10, pady=15, sticky='ew')
+    criar_label(janela_add,"Qtde:", column=0, row=2)
     texto_qtde = tkinter.StringVar()
     qtde = tkinter.Entry(janela_add, textvariable=texto_qtde)
     qtde.grid(row=2, column=1, padx=8, pady=15, sticky='ew')
-
-    label_preco = tkinter.Label(janela_add, text="Preço:", font="Consolas 10")
-    label_preco.grid(row=3, column=0, padx=10, pady=15, sticky='ew')
+    criar_label(janela_add,"Preço:", column=0, row=3)
     texto_preco = tkinter.StringVar()
     preco = tkinter.Entry(janela_add, textvariable=texto_preco)
     preco.grid(row=3, column=1, padx=8, pady=15, sticky='ew')
@@ -680,10 +669,7 @@ def editar_produto(tv):
             centralizar_janela(editar_janela)
 
             # Criando o título diretamente na função principal
-            label = tkinter.Label(
-                editar_janela, text="Preencha os campos a seguir", font="Consolas 13 bold"
-            )
-            label.grid(row=0, column=1, pady=10, sticky='ew')
+            criar_label(editar_janela,"Preencha os campos a seguir", column=1, row=0 )
 
             # Criando campos de edição
             nome, qtde, preco = criar_campos_edicao(editar_janela, produto)
@@ -734,12 +720,7 @@ def tela_edit_produto():
     root_edit.resizable(False, False)
     root_edit.title("Editar Produto")
     root_edit.geometry("445x440")
-
-    label = tkinter.Label(
-        root_edit, text="Selecione o Produto que deseja Editar", font="Consolas 13 bold"
-    )
-    label.grid(row=0, column=0, pady=10, sticky='ew')
-
+    criar_label(root_edit, "Selecione o Produto que deseja Editar", column=0, row=0)
     dados = buscar_produtos()
 
     tabela = tkinter.Frame(root_edit)
@@ -791,13 +772,9 @@ def select_produto():
     root_select.resizable(False, False)
     root_select.title("Tabela de Produtos")
     root_select.geometry("622x400")
+    criar_label(root_select, "Estoque dos Produtos", column=0, row=0)
 
-    label = tkinter.Label(
-        root_select, text="Estoque dos Produtos", font="Consolas 13 bold")
-    label.grid(row=0, column=0, pady=10, sticky='ew')
-
-    cursor.execute("SELECT * FROM Produtos")
-    dados = cursor.fetchall()
+    dados = buscar_produtos()
 
     tabela = tkinter.Frame(root_select)
     tabela.grid(row=1, column=0, padx=10, pady=10)
