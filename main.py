@@ -4,7 +4,7 @@ Este é o módulo principal do projeto.
 """
 import sqlite3
 import tkinter
-from tkinter import messagebox as mb, Label, PhotoImage
+from tkinter import messagebox as mb, Label, PhotoImage, ttk
 from time import strftime
 import datetime
 from PIL import Image, ImageTk
@@ -40,103 +40,128 @@ cursor.execute(
     """
 )
 
-def tela_inicial():
-    """
-    Tela inicial do sistema.
-    """
+
+def criar_janela_inicial():
+    """Cria a janela inicial."""
     tela_inicio = tkinter.Tk()
     tela_inicio.title("Inicio")
     tela_inicio.resizable(False, False)
     tela_inicio.focus_force()
-    app_state["tela_inicio"] = tela_inicio
-    path = r"Projetos\Sistema de Estoque\wallpaper.png"
-    bg = PhotoImage(path)
-    label1 = Label(tela_inicio, image = bg)
-    label1.place(x = 0,y = 0)
+    return tela_inicio
 
+def configurar_background(tela_inicio, caminho_imagem):
+    """Configura o fundo da tela."""
+    bg = PhotoImage(file=caminho_imagem)
+    label_bg = Label(tela_inicio, image=bg)
+    label_bg.image = bg
+    label_bg.place(x=0, y=0)
+
+def adicionar_logo(tela_inicio, caminho_logo):
+    """Adiciona o logotipo à tela."""
+    image = Image.open(caminho_logo)
+    image.thumbnail((400, 300))
+    test = ImageTk.PhotoImage(image)
+    label_logo = tkinter.Label(tela_inicio, image=test)
+    label_logo.image = test
+    label_logo.grid(row=1, column=1, pady=10, padx=47)
+
+def criar_botao(tela, texto, comando, cor_fundo="#FFFFFF", row=0, **kwargs):
+    """
+    Cria e posiciona um botão.
+
+    Parâmetros:
+    - tela: Widget pai onde o botão será inserido.
+    - texto: Texto exibido no botão.
+    - comando: Função executada ao clicar no botão.
+    - cor_fundo: Cor de fundo do botão.
+    - row: Posição (linha) do botão.
+    - kwargs: Configurações opcionais adicionais, como padx, pady, column, sticky.
+    """
+    padrao_kwargs = {
+        "font": "Consolas 10",
+        "bg": cor_fundo,
+        "fg": "white",
+        "command": comando,
+        "row": row,
+        "column": 1,
+        "padx": 20,
+        "pady": 10,
+        "sticky": 'ew'
+    }
+    padrao_kwargs.update(kwargs)
+
+    botao = tkinter.Button(
+        tela,
+        text=texto,
+        font=padrao_kwargs["font"],
+        bg=padrao_kwargs["bg"],
+        fg=padrao_kwargs["fg"],
+        command=padrao_kwargs["command"]
+    )
+    botao.grid(
+        row=padrao_kwargs["row"],
+        column=padrao_kwargs["column"],
+        padx=padrao_kwargs["padx"],
+        pady=padrao_kwargs["pady"],
+        sticky=padrao_kwargs["sticky"]
+    )
+    return botao
+
+def criar_label(tela_inicio, texto, column, row):
+    """Cria um label."""
     label = tkinter.Label(
-        tela_inicio, text="Bem vindo ao Sistema de Estoque!", font="Consolas 13 bold", bg="#FFFFFF")
-    label.grid(row=0, column=1, pady=10, sticky='ew')
-
-    image1 = Image.open(r"C:\Users\Mayson Medeiros\Documents\GitProjets\QDSW-Sistema-de-Estoque\logo.png")
-    width, height = 400, 300
-    image1.thumbnail((width, height))
-    test = ImageTk.PhotoImage(image1)
-    label1 = tkinter.Label(tela_inicio, image=test)
-    label1.image = test
-    label1.grid(row=1, column=1, pady=10, padx=47)
-
-    button_vender = tkinter.Button(
-        tela_inicio, text="Área de Vendas",
-        font="Consolas 10",
-        bg="#6B58FF",
-        fg="white",
-        command=tela_financeiro
-    )
-    button_vender.grid(row=2, column=1, padx=20, pady=10, sticky='ew')
-
-    button = tkinter.Button(
         tela_inicio,
-        text="Adicionar Novo Produto",
-        font="Consolas 10",
-        bg="#3D8EF0",
-        fg="white",
-        command=tela_add_produto
-   )
-    button.grid(row=3, column=1, padx=20, pady=10, sticky='ew')
-
-    botao_prova = tkinter.Button(
-        tela_inicio, text="Editar Produtos",
-        font="Consolas 10",
-        bg="#1CB9E4",
-        fg="white",
-        command=tela_edit_produto
+        text=texto,
+        font="Consolas 13 bold",
+        bg="#FFFFFF"
     )
-    botao_prova.grid(row=4, column=1, padx=20, pady=10, sticky='ew')
+    label.grid(row=row, column=column, pady=10, sticky='ew')
+    return label
+
+def exibir_estoque_botao(tela_inicio, baixo_estoque_count):
+    """Cria o botão para exibir estoque com ou sem alerta."""
+    exibir_texto = "Exibir Estoque ⚠️" if baixo_estoque_count > 0 else "Exibir Estoque"
+    cor_texto = "#75163F" if baixo_estoque_count > 0 else "white"
+    criar_botao(
+        tela_inicio,
+        exibir_texto,
+        select_produto,
+        cor_fundo="#0AB4B5",
+        row=5
+    ).config(fg=cor_texto)
+
+def atualizar_hora(label_hora, tela_inicio):
+    """Atualiza a hora no label."""
+    def tick():
+        hora_atual = strftime("%H:%M:%S")
+        label_hora.config(text=hora_atual, bg="#FFFFFF")
+        tela_inicio.after(1000, tick)
+
+    tick()
+
+def tela_inicial():
+    """Tela inicial do sistema."""
+    tela_inicio = criar_janela_inicial()
+    app_state["tela_inicio"] = tela_inicio  # Salva no estado global
+
+    configurar_background(tela_inicio, r"wallpaper.png")
+    criar_label(tela_inicio, "Bem vindo ao Sistema de Estoque!", row=0, column=1)
+    adicionar_logo(tela_inicio, r"logo.png")
+
+    criar_botao(tela_inicio, "Área de Vendas", tela_financeiro, cor_fundo="#6B58FF", row=2)
+    criar_botao(tela_inicio, "Adicionar Novo Produto", tela_add_produto, cor_fundo="#3D8EF0", row=3)
+    criar_botao(tela_inicio, "Editar Produtos", tela_edit_produto, cor_fundo="#1CB9E4", row=4)
 
     cursor.execute("SELECT COUNT(*) FROM Produtos WHERE qtde < 5")
     baixo_estoque_count = cursor.fetchone()[0]
+    exibir_estoque_botao(tela_inicio, baixo_estoque_count)
 
-    if baixo_estoque_count > 0:
-        botao_tabela = tkinter.Button(
-            tela_inicio,
-            text="Exibir Estoque ⚠️",
-            font="Consolas 10 bold",
-            bg="#0AB4B5",
-            fg="#75163F",
-            command=select_produto
-        )
-    else:
-        botao_tabela = tkinter.Button(
-            tela_inicio,
-            text="Exibir Estoque",
-            font="Consolas 10",
-            bg="#0AB4B5",
-            fg="white",
-            command=select_produto
-        )
-
-    botao_tabela.grid(row=5, column=1, padx=20, pady=10, sticky='ew')
-
-    button = tkinter.Button(
-        tela_inicio,
-        text="Sair do Programa",
-        font="Consolas 10",
-        bg="#4A2ED1",
-        fg="white",
-        command=tela_inicio.destroy
-    )
-    button.grid(row=6, column=1, padx=170, pady=50)
+    criar_botao(tela_inicio, "Sair do Programa",
+                tela_inicio.destroy, cor_fundo="#4A2ED1", row=6, padx=170, pady=50)
 
     label_hora = tkinter.Label(tela_inicio, font="Consolas 10")
     label_hora.grid(row=7, column=1, padx=10, sticky='e')
-
-    def atualizar_hora():
-        hora_atual = strftime("%H:%M:%S")
-        label_hora.config(text=hora_atual , bg="#FFFFFF")
-        tela_inicio.after(1000, atualizar_hora)
-
-    atualizar_hora()
+    atualizar_hora(label_hora, tela_inicio)
 
     tela_inicio.mainloop()
 
@@ -156,7 +181,7 @@ def tela_financeiro():
         janela_vendas, text="Área Financeira", font="Consolas 13 bold")
     label.grid(row=0, column=0, pady=10, sticky='ew')
 
-    imagem = Image.open(r"Projetos\Sistema de Estoque\logo2.png")
+    imagem = Image.open(r"logo2.png")
     width, height = 400, 300
     imagem.thumbnail((width, height))
     imagem = ImageTk.PhotoImage(imagem)
@@ -182,35 +207,13 @@ def tela_financeiro():
     )
     botao_voltar.grid(row=4, column=0, padx=100, pady=10, sticky='ew')
 
-def tela_vender_prod():
+def verificar_estoque(tela_produtos):
     """
-     Tela de venda de produtos.
+    busca produto no banco de dados e verifica quantidade.
+    retorna uma tela tkinter com informação da quantidade.
     """
-    app_state["janela_vendas"].withdraw()
-    root_vender = tkinter.Tk()
-    root_vender.resizable(False, False)
-    root_vender.title("Vender Produto")
-    root_vender.geometry("445x440")
-
-    label = tkinter.Label(
-    root_vender, text="Selecione o Produto que deseja Vender", font="Consolas 13 bold")
-    label.grid(row=0, column=0, pady=10, sticky='ew')
-
     cursor.execute("SELECT * FROM Produtos")
     dados = cursor.fetchall()
-
-    tabela = tkinter.Frame(root_vender)
-    tabela.grid(row=1, column=0, padx=10, pady=10)
-
-    tv = tkinter.ttk.Treeview(tabela, columns=(
-        'id', 'nome', 'preco', 'qtde'), show='headings')
-    tv.heading("id", text='ID')
-    tv.column("id", width=50)
-    tv.heading("nome", text='Nome')
-    tv.heading('preco', text='Preço')
-    tv.column("preco", width=120)
-    tv.heading('qtde', text='Qtde')
-    tv.column("qtde", width=50)
 
     for linha in dados:
         preco = linha[3]
@@ -221,131 +224,241 @@ def tela_vender_prod():
         quantidade = linha[2]
 
         if quantidade <= 5:
-            tv.insert('', 'end', values=(
+            tela_produtos.insert('', 'end', values=(
                 linha[0], linha[1], preco_formatado, linha[2]), tags=("baixo_estoque",))
         else:
-            tv.insert('', 'end', values=(
+            tela_produtos.insert('', 'end', values=(
                 linha[0], linha[1], preco_formatado, linha[2]))
+    return tela_produtos
 
+def vender_produto(tela_venda, tela_produto):
+    """
+    Inicia o processo de venda de um produto selecionado na interface de produtos.
+
+    Args:
+        tela_venda (tkinter.Widget): A janela atual de vendas.
+        tela_produto (tkinter.Widget): A interface com a lista de produtos.
+
+    Returns:
+        None
+    """
+    item_selecionado = tela_produto.selection()
+    if not item_selecionado:
+        mb.showerror("Erro", "Nenhum produto selecionado.")
+        return
+
+    id_produto = tela_produto.item(item_selecionado)['values'][0]
+    produto = buscar_produtos(id_produto)
+
+    if not produto:
+        mb.showerror("Erro", "Produto não encontrado.")
+        return
+
+    vender_janela = tkinter.Toplevel()
+    vender_janela.title("Vender Produto")
+    vender_janela.resizable(False, False)
+    vender_janela.geometry("400x300")
+
+    criar_label(vender_janela, "Preencha os campos a seguir", column=1, row=0)
+
+    criar_entrada_com_label(
+        vender_janela, "Nome:", produto[1], row=1
+    )
+
+    texto_qtde = criar_entrada_com_label(
+        vender_janela, "Qtde:", "1", row=2
+    )
+
+    label_preco_total = criar_label(vender_janela, "", row=3, column=1)
+
+    calcular_label_preco_total(produto, texto_qtde, label_preco_total)
+
+    botao_aumentar = tkinter.Button(
+        vender_janela, text="+", bg="#6B58FF", fg="white",
+        command=lambda: aumentar_quantidade(texto_qtde, produto, label_preco_total)
+    )
+    botao_aumentar.grid(row=2, column=2, padx=5, pady=15, sticky='w')
+
+    criar_label(vender_janela, "Preço Total:", row=3, column=0)
+
+    botao_salvar = tkinter.Button(
+        vender_janela, text="Salvar", bg="#6B58FF", fg="white",
+        command=lambda: salvar_venda(
+            produto, texto_qtde, label_preco_total, tela_venda, vender_janela
+        )
+    )
+    botao_salvar.grid(row=4, column=1, padx=5, pady=10, sticky='ew')
+
+    botao_voltar = tkinter.Button(
+        vender_janela, text="Voltar", bg="#3D8EF0", fg="white",
+        command=vender_janela.destroy
+    )
+    botao_voltar.grid(row=5, column=1, padx=20, pady=10, sticky='ew')
+
+
+def buscar_produtos(id_produto=None):
+    """
+    Busca produtos no banco de dados.
+    Args:
+        id_produto: O ID do produto a ser buscado. 
+        Se não fornecido, retorna todos os produtos.
+    Returns:
+        list/tuple: Lista com os dados dos produtos ou uma tupla com o produto encontrado, 
+                    ou None se não encontrado.
+    """
+    if id_produto:
+        return cursor.execute(
+            "SELECT * FROM Produtos WHERE iD=?", (id_produto,)
+        ).fetchone()
+
+    cursor.execute("SELECT * FROM Produtos")
+    return cursor.fetchall()
+
+
+def aumentar_quantidade(texto_qtde, produto, label_preco_total):
+    """
+    Incrementa a quantidade selecionada e recalcula o preço total.
+
+    Args:
+        texto_qtde (tkinter.StringVar): A variável vinculada ao campo de quantidade.
+        produto (tuple): Os dados do produto.
+        label_preco_total (tkinter.Label): O rótulo onde o preço total é exibido.
+
+    Returns:
+        None
+    """
+    try:
+        nova_quantidade = int(texto_qtde.get()) + 1
+        texto_qtde.set(nova_quantidade)
+        calcular_label_preco_total(produto, texto_qtde, label_preco_total)
+    except ValueError:
+        texto_qtde.set("1")
+        calcular_label_preco_total(produto, texto_qtde, label_preco_total)
+
+
+def calcular_label_preco_total(produto, texto_qtde, label_preco_total):
+    """
+    Recalcula e atualiza o preço total com base na quantidade selecionada.
+
+    Args:
+        produto (tuple): Os dados do produto.
+        texto_qtde (tkinter.StringVar): A variável vinculada ao campo de quantidade.
+        label_preco_total (tkinter.Label): O rótulo onde o preço total é exibido.
+
+    Returns:
+        None
+    """
+    try:
+        nova_qtde = int(texto_qtde.get())
+        label_preco_total.config(
+            text=f"R$ {produto[3] * nova_qtde:.2f}"
+        )
+    except ValueError:
+        label_preco_total.config(text="R$ 0.00")
+
+
+def salvar_venda(produto, texto_qtde, label_preco_total, tela_venda, vender_janela):
+    """
+    Salva a venda no banco de dados, atualiza o estoque e exibe mensagens de sucesso ou erro.
+
+    Args:
+        produto (tuple): Os dados do produto.
+        texto_qtde (tkinter.StringVar): A variável vinculada ao campo de quantidade.
+        label_preco_total (tkinter.Label): O rótulo onde o preço total é exibido.
+        tela_venda (tkinter.Widget): A janela atual de vendas.
+        vender_janela (tkinter.Toplevel): A janela atual de venda do produto.
+
+    Returns:
+        None
+    """
+    try:
+        nova_qtde = int(texto_qtde.get())
+    except ValueError:
+        mb.showerror("Erro", "Quantidade inválida.")
+        return
+
+    if nova_qtde > produto[2]:
+        mb.showerror("Erro", "Quantidade insuficiente em estoque.")
+        return
+
+    if not mb.askyesno(
+        "Vender Produto",
+        f"Vender produto '{produto[1]}' por '{label_preco_total.cget('text')}'?",
+    ):
+        return
+
+    data_atual = datetime.datetime.now().strftime('%H:%M:%S, %d-%m-%Y')
+
+    cursor.execute(
+        "UPDATE Produtos SET qtde=qtde-? WHERE iD=?", (nova_qtde, produto[0])
+    )
+    cursor.execute(
+        """
+        INSERT INTO Vendas (nomeVenda, qtde, precoTotal, data)
+        VALUES (?, ?, ?, ?)
+        """,
+        (produto[1], nova_qtde, label_preco_total.cget('text'), data_atual),
+    )
+
+    connection.commit()
+
+    mb.showinfo(
+        "Sucesso",
+        f"Venda realizada!! Preço total: {label_preco_total.cget('text')}",
+    )
+    vender_janela.destroy()
+    tela_venda.destroy()
+    app_state["tela_inicio"].withdraw().destroy()
+    tela_inicial()
+
+
+def criar_entrada_com_label(janela, texto_label, valor_inicial, row):
+    """
+    Cria um campo de entrada com rótulo associado.
+
+    Args:
+        janela (tkinter.Widget): A janela onde o campo será criado.
+        texto_label (str): O texto do rótulo.
+        valor_inicial (str): O valor inicial do campo de entrada.
+        row (int): A linha onde o campo será posicionado.
+
+    Returns:
+        tkinter.StringVar: A variável vinculada ao campo de entrada.
+    """
+    criar_label(janela, texto_label, row=row, column=0)
+    texto_var = tkinter.StringVar(value=valor_inicial)
+    entrada = tkinter.Entry(janela, textvariable=texto_var)
+    entrada.grid(row=row, column=1, padx=8, pady=15, sticky='ew')
+    return texto_var
+
+def tela_vender_prod():
+    """
+     Tela de venda de produtos.
+    """
+    app_state["janela_vendas"].withdraw()
+    root_vender = tkinter.Tk()
+    root_vender.resizable(False, False)
+    root_vender.title("Vender Produto")
+    root_vender.geometry("445x440")
+
+    criar_label(root_vender,"Selecione o Produto que deseja Vender",0,0)
+    tabela = tkinter.Frame(root_vender)
+    tabela.grid(row=1, column=0, padx=10, pady=10)
+
+    tv = ttk.Treeview(tabela, columns=(
+        'id', 'nome', 'preco', 'qtde'), show='headings')
+    tv.heading("id", text='ID')
+    tv.column("id", width=50)
+    tv.heading("nome", text='Nome')
+    tv.heading('preco', text='Preço')
+    tv.column("preco", width=120)
+    tv.heading('qtde', text='Qtde')
+    tv.column("qtde", width=50)
+
+    tv = verificar_estoque(tela_produtos=tv)
     tv.tag_configure("baixo_estoque", foreground="#EB3324")
     tv.pack()
-
-    def vender_produto():
-        item_selecionado = tv.selection()
-        if item_selecionado:
-            item = tv.item(item_selecionado)
-            id_produto = item['values'][0]
-            produto = cursor.execute(
-                "SELECT * FROM Produtos WHERE iD=?", (id_produto,)).fetchone()
-            if produto:
-                vender_janela = tkinter.Toplevel()
-                vender_janela.title("Vender Produto")
-                vender_janela.resizable(False, False)
-                vender_janela.geometry("400x300")
-
-                label = tkinter.Label(
-                    vender_janela, text="Preencha os campos a seguir", font="Consolas 13 bold")
-                label.grid(row=0, column=1, pady=10, sticky='ew')
-
-                label_nome = tkinter.Label(
-                    vender_janela, text="Nome:", font="Consolas 10")
-                label_nome.grid(row=1, column=0, padx=10, pady=15, sticky='ew')
-                texto_nome = tkinter.StringVar(value=produto[1])
-                nome = tkinter.Entry(vender_janela, textvariable=texto_nome)
-                nome.grid(row=1, column=1, padx=8, pady=15, sticky='ew')
-                label_qtde = tkinter.Label(
-                    vender_janela, text="Qtde:", font="Consolas 10")
-                label_qtde.grid(row=2, column=0, padx=10, pady=15, sticky='ew')
-                texto_qtde = tkinter.StringVar(value=1)
-                qtde = tkinter.Entry(vender_janela, textvariable=texto_qtde)
-                qtde.grid(row=2, column=1, padx=8, pady=15, sticky='ew')
-
-                def calcular_preco_total():
-                    nova_qtde = int(qtde.get())
-                    preco_total.config(
-                        text=f"R$ {produto[3] * nova_qtde:.2f}"
-                    )
-                def aumentar_quantidade():
-                    nova_quantidade = int(texto_qtde.get()) + 1
-                    texto_qtde.set(nova_quantidade)
-                    calcular_preco_total()
-
-                botao_aumentar = tkinter.Button(
-                    vender_janela, text="+", bg="#6B58FF", fg="white", command=aumentar_quantidade)
-                botao_aumentar.grid(row=2, column=2, padx=5,
-                                    pady=15, sticky='w')
-
-                label_preco_total = tkinter.Label(
-                    vender_janela, text="Preço Total:", font="Consolas 10")
-                label_preco_total.grid(
-                    row=3, column=0, padx=10, pady=15, sticky='ew')
-
-                preco_total = tkinter.Label(
-                    vender_janela, text="", font="Consolas 10 bold")
-                preco_total.grid(row=3, column=1, padx=8, pady=15, sticky='ew')
-
-                calcular_preco_total()
-
-                def salvar_venda():
-                    nova_qtde = int(qtde.get())
-
-                    data_atual = datetime.datetime.now()
-
-                    data_formatada = data_atual.strftime('%H:%M:%S, %d-%m-%Y')
-
-                    if nova_qtde <= produto[2]:
-
-                        calcular_preco_total()
-
-                        if mb.askyesno(
-                                 "Vender Produto",
-                                 f"Vender produto '{produto[1]}' por '{preco_total.cget('text')}'?"
-                        ):
-                            cursor.execute(
-                                "UPDATE Produtos SET qtde=qtde-? WHERE iD=?", 
-                                (nova_qtde, id_produto)
-                            )
-
-                            cursor.execute(
-                             """
-                            INSERT INTO Vendas (nomeVenda, qtde, precoTotal, data)
-                            VALUES (?, ?, ?, ?)
-                             """,
-                              (
-                                produto[1],
-                                nova_qtde,
-                                preco_total.cget('text'),
-                                data_formatada
-                              )
-                           )
-
-                            connection.commit()
-
-                            mb.showinfo(
-                                "Sucesso",
-                                f"Venda realizada!! Preço total: {preco_total.cget('text')}")
-                            vender_janela.destroy()
-                            root_vender.destroy()
-                            app_state["tela_inicio"].withdraw().destroy()
-                            tela_inicial()
-                    else:
-                        mb.showerror(
-                            "Erro", "Quantidade insuficiente em estoque.")
-
-                botao_salvar = tkinter.Button(
-                    vender_janela, text="Salvar", bg="#6B58FF", fg="white", command=salvar_venda)
-                botao_salvar.grid(row=4, column=1, padx=5,
-                                  pady=10, sticky='ew')
-
-                botao_voltar = tkinter.Button(
-                                vender_janela,
-                                text="Voltar",
-                                bg="#3D8EF0",
-                                fg="white",
-                                command=vender_janela.destroy
-                )
-                botao_voltar.grid(row=5, column=1, padx=20,
-                                  pady=10, sticky='ew')
+    vender_produto(root_vender, tv)
 
     botao_vender = tkinter.Button(
         root_vender, text="Vender Produto", bg="#6B58FF", fg="white", command=vender_produto)
@@ -380,7 +493,7 @@ def exibir_vendas():
     tabela = tkinter.Frame(root_consulta)
     tabela.grid(row=1, column=0, padx=10, pady=10)
 
-    tv = tkinter.ttk.Treeview(tabela, columns=(
+    tv = ttk.Treeview(tabela, columns=(
         'ID', 'Nome', 'Quantidade', 'Preço Total', 'Data'), show='headings')
     tv.heading("ID", text='ID')
     tv.column("ID", width=50)
@@ -476,9 +589,146 @@ def tela_add_produto():
         if mb.askyesno("Adicionar outro produto", "Deseja adicionar outro produto?"):
             tela_add_produto()
 
+def salvar_edicao(id_produto, nome, qtde, preco):
+    """
+    Salva as edições feitas no produto no banco de dados.
+
+    Args:
+        id_produto (int): ID do produto a ser atualizado.
+        nome (str): Novo nome do produto.
+        qtde (int): Nova quantidade do produto.
+        preco (float): Novo preço do produto.
+
+    Returns:
+        bool: True se a atualização foi bem-sucedida, False caso contrário.
+    """
+    try:
+        qtde = int(qtde)
+        preco = float(preco.replace(',', '.').replace('R$', ''))
+        cursor.execute(
+            "UPDATE Produtos SET nome=?, qtde=?, preco=? WHERE iD=?",
+            (nome, qtde, preco, id_produto)
+        )
+        connection.commit()
+        return True
+    except ValueError:
+        return False
+
+def deletar_produtos(itens_para_deletar):
+    """
+    Deleta produtos do banco de dados.
+
+    Args:
+        itens_para_deletar (list): Lista de tuplas contendo ID e nome do produto a ser deletado.
+
+    Returns:
+        None
+    """
+    for id_produto, _ in itens_para_deletar:
+        cursor.execute("DELETE FROM Produtos WHERE iD=?", (id_produto,))
+    connection.commit()
+
+def criar_campos_edicao(editar_janela, produto):
+    """
+    Cria os campos de edição para o produto.
+
+    Args:
+        editar_janela (Tk): A janela onde os campos serão criados.
+        produto (tuple): Os dados do produto a ser editado.
+
+    Returns:
+        tuple: Os campos de nome, quantidade e preço.
+    """
+    texto_nome = tkinter.StringVar(value=produto[1])
+    nome = tkinter.Entry(editar_janela, textvariable=texto_nome)
+    nome.grid(row=1, column=1, padx=8, pady=15, sticky='ew')
+
+    texto_qtde = tkinter.StringVar(value=produto[2])
+    qtde = tkinter.Entry(editar_janela, textvariable=texto_qtde)
+    qtde.grid(row=2, column=1, padx=8, pady=15, sticky='ew')
+
+    texto_preco = tkinter.StringVar(value=produto[3])
+    preco = tkinter.Entry(editar_janela, textvariable=texto_preco)
+    preco.grid(row=3, column=1, padx=8, pady=15, sticky='ew')
+
+    return nome, qtde, preco
+
+# Função para editar um produto
+def editar_produto(tv):
+    """
+    Permite editar um produto selecionado na tabela.
+
+    Args:
+        tv (Treeview): A tabela de produtos onde o item será selecionado para edição.
+
+    Returns:
+        None
+    """
+    item_selecionado = tv.selection()
+    if item_selecionado:
+        item = tv.item(item_selecionado)
+        id_produto = item['values'][0]
+
+        # Buscando o produto no banco de dados
+        produto = buscar_produtos(id_produto)
+
+        if produto:
+            editar_janela = tkinter.Tk()
+            editar_janela.title("Editar Produto")
+            editar_janela.resizable(False, False)
+            editar_janela.geometry("360x300")
+            centralizar_janela(editar_janela)
+
+            # Criando o título diretamente na função principal
+            label = tkinter.Label(
+                editar_janela, text="Preencha os campos a seguir", font="Consolas 13 bold"
+            )
+            label.grid(row=0, column=1, pady=10, sticky='ew')
+
+            # Criando campos de edição
+            nome, qtde, preco = criar_campos_edicao(editar_janela, produto)
+
+            # Botão para salvar a edição
+            botao_salvar = tkinter.Button(
+                editar_janela, text="Salvar", bg="#6B58FF", fg="white",
+                command=lambda: salvar_edicao(id_produto, nome.get(), qtde.get(), preco.get())
+            )
+            botao_salvar.grid(row=4, column=1, padx=5, pady=10, sticky='ew')
+
+            # Botão para voltar
+            botao_voltar = tkinter.Button(
+                editar_janela, text="Voltar", bg="#3D8EF0", fg="white",
+                command=editar_janela.destroy
+            )
+            botao_voltar.grid(row=5, column=1, padx=20, pady=10, sticky='ew')
+
+def deletar_produto(tv):
+    """
+    Deleta os produtos selecionados na tabela.
+
+    Args:
+        tv (Treeview): A tabela de produtos onde os itens serão selecionados para exclusão.
+
+    Returns:
+        None
+    """
+    itens_selecionados = tv.selection()
+    if itens_selecionados:
+        itens_para_deletar = [(tv.item(item)['values'][0],
+                                tv.item(item)['values'][1])
+                                for item in itens_selecionados]
+
+        logica_confirmacao_deletar = mb.askyesno("Deletar Produtos",
+                       "Deseja mesmo deletar os produtos selecionados?",
+                       icon='warning')
+        if logica_confirmacao_deletar:
+            deletar_produtos(itens_para_deletar)
+            app_state["tela_inicio"].withdraw().destroy()
+            tela_inicial()
+
 def tela_edit_produto():
     """
-    Tela edição/atualização de produtos.
+    Tela de edição e atualização de produtos.
     """
     root_edit = tkinter.Tk()
     root_edit.resizable(False, False)
@@ -486,17 +736,16 @@ def tela_edit_produto():
     root_edit.geometry("445x440")
 
     label = tkinter.Label(
-        root_edit, text="Selecione o Produto que deseja Editar", font="Consolas 13 bold")
+        root_edit, text="Selecione o Produto que deseja Editar", font="Consolas 13 bold"
+    )
     label.grid(row=0, column=0, pady=10, sticky='ew')
 
-    cursor.execute("SELECT * FROM Produtos")
-    dados = cursor.fetchall()
+    dados = buscar_produtos()
 
     tabela = tkinter.Frame(root_edit)
     tabela.grid(row=1, column=0, padx=10, pady=10)
 
-    tv = tkinter.ttk.Treeview(tabela, columns=(
-        'id', 'nome', 'preco', 'qtde'), show='headings')
+    tv = ttk.Treeview(tabela, columns=('id', 'nome', 'preco', 'qtde'), show='headings')
     tv.heading("id", text='ID')
     tv.column("id", width=50)
     tv.heading("nome", text='Nome')
@@ -507,139 +756,30 @@ def tela_edit_produto():
 
     for linha in dados:
         preco = linha[3]
-        if preco:
-            preco_formatado = f'R$ {float(preco):.2f}'
-        else:
-            preco_formatado = ''
+        preco_formatado = f'R$ {float(preco):.2f}' if preco else ''
         quantidade = linha[2]
-
-        if quantidade <= 5:
-            tv.insert('', 'end', values=(
-                linha[0], linha[1], preco_formatado, linha[2]), tags=("baixo_estoque",))
-        else:
-            tv.insert('', 'end', values=(
-                linha[0], linha[1], preco_formatado, linha[2]))
+        tag = "baixo_estoque" if quantidade <= 5 else ""
+        tv.insert('', 'end', values=(linha[0], linha[1], preco_formatado, linha[2]), tags=(tag,))
 
     tv.tag_configure("baixo_estoque", foreground="#EB3324")
-
     tv.pack()
 
-    def editar_produto():
-        item_selecionado = tv.selection()
-        if item_selecionado:
-            item = tv.item(item_selecionado)
-            id_produto = item['values'][0]
-            produto = cursor.execute(
-                "SELECT * FROM Produtos WHERE iD=?", (id_produto,)).fetchone()
-            if produto:
-                editar_janela = tkinter.Tk()
-                editar_janela.title("Editar Produto")
-                editar_janela.resizable(False, False)
-                editar_janela.geometry("360x300")
-
-                centralizar_janela(editar_janela)
-
-                label = tkinter.Label(
-                    editar_janela, text="Preencha os campos a seguir", font="Consolas 13 bold")
-                label.grid(row=0, column=1, pady=10, sticky='ew')
-
-                label_nome = tkinter.Label(
-                    editar_janela, text="Nome:", font="Consolas 10")
-                label_nome.grid(row=1, column=0, padx=10, pady=15, sticky='ew')
-                texto_nome = tkinter.StringVar(value=produto[1])
-                nome = tkinter.Entry(editar_janela, textvariable=texto_nome)
-                nome.grid(row=1, column=1, padx=8, pady=15, sticky='ew')
-
-                label_qtde = tkinter.Label(
-                    editar_janela, text="Qtde:", font="Consolas 10")
-                label_qtde.grid(row=2, column=0, padx=10, pady=15, sticky='ew')
-                texto_qtde = tkinter.StringVar(value=produto[2])
-                qtde = tkinter.Entry(editar_janela, textvariable=texto_qtde)
-                qtde.grid(row=2, column=1, padx=8, pady=15, sticky='ew')
-
-                label_preco = tkinter.Label(
-                    editar_janela, text="Preço:", font="Consolas 10")
-                label_preco.grid(row=3, column=0, padx=10,
-                                 pady=15, sticky='ew')
-                texto_preco = tkinter.StringVar(value=produto[3])
-                preco = tkinter.Entry(editar_janela, textvariable=texto_preco)
-                preco.grid(row=3, column=1, padx=8, pady=15, sticky='ew')
-
-                def salvar_edicao():
-                    novo_nome = nome.get()
-                    nova_qtde = qtde.get()
-                    novo_preco = preco.get()
-
-                    try:
-                        nova_qtde = int(nova_qtde)
-                        novo_preco = float(novo_preco.replace(
-                            ',', '.').replace('R$', ''))
-                        cursor.execute("UPDATE Produtos SET nome=?, qtde=?, preco=? WHERE iD=?",
-                                       (novo_nome, nova_qtde, novo_preco, id_produto))
-                        connection.commit()
-                        mb.showinfo(
-                            "Sucesso", "Produto atualizado com sucesso!")
-                        editar_janela.destroy()
-                        root_edit.destroy()
-
-                        app_state["tela_inicio"].withdraw().destroy()
-                        tela_inicial()
-                    except ValueError:
-                        mb.showerror(
-                            "Erro", "Por favor, insira uma quantidade e preço válidos.")
-
-                botao_salvar = tkinter.Button(
-                    editar_janela, text="Salvar", bg="#6B58FF", fg="white", command=salvar_edicao)
-                botao_salvar.grid(row=4, column=1, padx=5,
-                                  pady=10, sticky='ew')
-
-                botao_voltar = tkinter.Button(
-                                    editar_janela,
-                                    text="Voltar",
-                                    bg="#3D8EF0",
-                                    fg="white",
-                                    command=editar_janela.destroy
-                )
-                botao_voltar.grid(row=5, column=1, padx=20,
-                                  pady=10, sticky='ew')
-
-    def deletar_produto():
-
-        itens_selecionados = tv.selection()
-
-        if itens_selecionados:
-            itens_para_deletar = []
-
-            for item_selecionado in itens_selecionados:
-
-                item = tv.item(item_selecionado)
-                nome_produto = item['values'][1]
-                itens_para_deletar.append((item['values'][0], nome_produto))
-
-            if mb.askyesno(
-                "Deletar Produtos",
-                "Deseja mesmo deletar os produtos selecionados?",
-                icon='warning'
-                ):
-                for id_produto, _ in itens_para_deletar:
-                    cursor.execute(
-                        "DELETE FROM Produtos WHERE iD=?", (id_produto,))
-
-                connection.commit()
-                root_edit.destroy()
-                app_state["tela_inicio"].withdraw().destroy()
-                tela_inicial()
 
     botao_editar = tkinter.Button(
-        root_edit, text="Editar", bg="#6B58FF", fg="white", command=editar_produto)
+        root_edit, text="Editar", bg="#6B58FF", fg="white", command=lambda: editar_produto(tv)
+    )
     botao_editar.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
+
     botao_deletar = tkinter.Button(
-        root_edit, text="Deletar", bg="#3D8EF0", fg="white", command=deletar_produto)
+        root_edit, text="Deletar", bg="#3D8EF0", fg="white", command=lambda: deletar_produto(tv)
+    )
     botao_deletar.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
 
+
     botao_fechar = tkinter.Button(
-        root_edit, text="Voltar", bg="#1CB9E4", fg="white", command=root_edit.destroy)
+        root_edit, text="Voltar", bg="#1CB9E4", fg="white", command=root_edit.destroy
+    )
     botao_fechar.grid(row=4, column=0, padx=50, pady=10, sticky="ew")
 
 
@@ -662,7 +802,7 @@ def select_produto():
     tabela = tkinter.Frame(root_select)
     tabela.grid(row=1, column=0, padx=10, pady=10)
 
-    tv = tkinter.ttk.Treeview(tabela, columns=(
+    tv = ttk.Treeview(tabela, columns=(
         'nome', 'preco', 'qtde'), show='headings')
     tv.heading("nome", text='Nome')
     tv.heading('preco', text='Preço')
