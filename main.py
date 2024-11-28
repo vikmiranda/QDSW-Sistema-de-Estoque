@@ -322,7 +322,7 @@ def buscar_vendas(db_cursor):
     """
     try:
         db_cursor.execute("SELECT * FROM Vendas")
-        return cursor.fetchall()
+        return db_cursor.fetchall()
     except sqlite3.DatabaseError as e:
         print(f"Erro ao acessar o banco de dados: {e}")
         return None
