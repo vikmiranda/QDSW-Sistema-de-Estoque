@@ -312,7 +312,7 @@ def buscar_produtos(id_produto=None):
     cursor.execute("SELECT * FROM Produtos")
     return cursor.fetchall()
 
-def buscar_vendas(cursor):
+def buscar_vendas(db_cursor):
     """
     Busca vendas no banco de dados.
     Returns:
@@ -320,13 +320,10 @@ def buscar_vendas(cursor):
                     ou None se não encontrado ou em caso de erro.
     """
     try:
-        cursor.execute("SELECT * FROM Vendas")
+        db_cursor.execute("SELECT * FROM Vendas")
         return cursor.fetchall()
     except sqlite3.DatabaseError as e:
         print(f"Erro ao acessar o banco de dados: {e}")
-        return None
-    except Exception as e:
-        print(f"Erro inesperado: {e}")
         return None
 
 
@@ -573,6 +570,17 @@ def tela_add_produto():
 
 
 def add_produto(nome, qtde, preco):
+    """
+    Adiciona um novo produto ao banco de dados de produtos.
+
+    Esta função recebe os detalhes de um produto (nome, preço e quantidade),
+    e os insere na tabela de produtos no banco de dados.
+
+    Parameters:
+    - nome (str): O nome do produto a ser adicionado.
+    - preco (float): O preço do produto. Deve ser um valor numérico positivo.
+    - quantidade (int): A quantidade do produto disponível no estoque.
+    """
 
     try:
         qtde = int(qtde)
