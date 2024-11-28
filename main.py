@@ -313,6 +313,23 @@ def buscar_produtos(id_produto=None):
     cursor.execute("SELECT * FROM Produtos")
     return cursor.fetchall()
 
+def buscar_vendas(cursor):
+    """
+    Busca vendas no banco de dados.
+    Returns:
+        list/tuple: Lista com os dados das vendas, 
+                    ou None se não encontrado ou em caso de erro.
+    """
+    try:
+        cursor.execute("SELECT * FROM Vendas")
+        return cursor.fetchall()
+    except sqlite3.DatabaseError as e:
+        print(f"Erro ao acessar o banco de dados: {e}")
+        return None
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+        return None
+
 
 def aumentar_quantidade(texto_qtde, produto, label_preco_total):
     """
@@ -483,8 +500,7 @@ def exibir_vendas():
     root_consulta.geometry("562x400")
     criar_label(root_consulta,"Histórico de Vendas",column=0,row=0)
 
-    cursor.execute("SELECT * FROM Vendas")
-    vendas_data = cursor.fetchall()
+    vendas_data = buscar_vendas(cursor)
 
     tabela = tkinter.Frame(root_consulta)
     tabela.grid(row=1, column=0, padx=10, pady=10)
@@ -537,14 +553,12 @@ def tela_add_produto():
     preco.grid(row=3, column=1, padx=8, pady=15, sticky='ew')
 
     botao_add = tkinter.Button(
-                    janela_add,
-                    text="Concluir",
-                    bg="#6B58FF",
-                    fg="white",
-                    command=lambda: add_produto(nome.get(),
-                    qtde.get(),
-                    preco.get())
-    )
+        janela_add,
+        text="Concluir",
+        bg="#6B58FF",
+        fg="white",
+        command=lambda: (add_produto(nome.get(), qtde.get(), preco.get()))
+)
     botao_add.grid(row=4, column=1, padx=10, pady=10, sticky='ew')
 
     botao_voltar = tkinter.Button(
@@ -558,8 +572,8 @@ def tela_add_produto():
     )
     botao_voltar.grid(row=5, column=1, padx=100, pady=10, sticky='ew')
 
+
 def add_produto(nome, qtde, preco):
-    app_state["janela_add"].destroy()
 
     try:
         qtde = int(qtde)
@@ -571,7 +585,6 @@ def add_produto(nome, qtde, preco):
         mb.showerror(
             "Erro", "Por favor, insira uma quantidade e preço válidos.")
         tela_add_produto()
-        return
 
     mb.showinfo(
         "Sucesso", f"'{nome}'({qtde}) Adicionado ao Estoque .")
