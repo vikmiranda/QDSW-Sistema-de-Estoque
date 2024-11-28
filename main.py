@@ -600,7 +600,7 @@ def add_produto(nome, qtde, preco):
     if mb.askyesno("Adicionar outro produto", "Deseja adicionar outro produto?"):
         tela_add_produto()
 
-def salvar_edicao(id_produto, nome, qtde, preco):
+def salvar_edicao(db_cursor, id_produto, nome, qtde, preco):
     """
     Salva as edições feitas no produto no banco de dados.
 
@@ -616,7 +616,7 @@ def salvar_edicao(id_produto, nome, qtde, preco):
     try:
         qtde = int(qtde)
         preco = float(preco.replace(',', '.').replace('R$', ''))
-        cursor.execute(
+        db_cursor.execute(
             "UPDATE Produtos SET nome=?, qtde=?, preco=? WHERE iD=?",
             (nome, qtde, preco, id_produto)
         )
@@ -625,19 +625,25 @@ def salvar_edicao(id_produto, nome, qtde, preco):
     except ValueError:
         return False
 
-def deletar_produtos(itens_para_deletar):
+def deletar_produtos(db_cursor, itens_para_deletar):
     """
     Deleta produtos do banco de dados.
 
     Args:
+        db_cursor (sqlite3.Cursor): Cursor do banco de dados.
         itens_para_deletar (list): Lista de tuplas contendo ID e nome do produto a ser deletado.
 
     Returns:
-        None
+        bool: True se todos os itens forem deletados com sucesso, False em caso de erro.
     """
-    for id_produto, _ in itens_para_deletar:
-        cursor.execute("DELETE FROM Produtos WHERE iD=?", (id_produto,))
-    connection.commit()
+    try:
+        for id_produto, _ in itens_para_deletar:
+            db_cursor.execute("DELETE FROM Produtos WHERE id=?", (id_produto,))
+        connection.commit()
+        return True
+    except ValueError:
+        return False
+
 
 def criar_campos_edicao(editar_janela, produto):
     """
@@ -699,7 +705,7 @@ def editar_produto(tv):
             # Botão para salvar a edição
             botao_salvar = tkinter.Button(
                 editar_janela, text="Salvar", bg="#6B58FF", fg="white",
-                command=lambda: salvar_edicao(id_produto, nome.get(), qtde.get(), preco.get())
+                command=lambda: salvar_edicao(cursor, id_produto, nome.get(), qtde.get(), preco.get())
             )
             botao_salvar.grid(row=4, column=1, padx=5, pady=10, sticky='ew')
 
@@ -730,7 +736,7 @@ def deletar_produto(tv):
                        "Deseja mesmo deletar os produtos selecionados?",
                        icon='warning')
         if logica_confirmacao_deletar:
-            deletar_produtos(itens_para_deletar)
+            deletar_produtos(cursor,itens_para_deletar)
             app_state["tela_inicio"].withdraw().destroy()
             tela_inicial()
 
