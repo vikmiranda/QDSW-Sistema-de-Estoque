@@ -17,6 +17,7 @@ app_state = {
 
 connection = sqlite3.connect("Database.db")
 cursor = connection.cursor()
+
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS Produtos (
@@ -557,26 +558,26 @@ def tela_add_produto():
     )
     botao_voltar.grid(row=5, column=1, padx=100, pady=10, sticky='ew')
 
-    def add_produto(nome, qtde, preco):
-        janela_add.destroy()
+def add_produto(nome, qtde, preco):
+    app_state["janela_add"].destroy()
 
-        try:
-            qtde = int(qtde)
-            preco = float(preco.replace(',', '.').replace('R$', ''))
-            cursor.execute(
-                "INSERT INTO Produtos (nome, qtde, preco) VALUES (?, ?, ?)", (nome, qtde, preco))
-            connection.commit()
-        except ValueError:
-            mb.showerror(
-                "Erro", "Por favor, insira uma quantidade e preço válidos.")
-            tela_add_produto()
-            return
+    try:
+        qtde = int(qtde)
+        preco = float(preco.replace(',', '.').replace('R$', ''))
+        cursor.execute(
+            "INSERT INTO Produtos (nome, qtde, preco) VALUES (?, ?, ?)", (nome, qtde, preco))
+        connection.commit()
+    except ValueError:
+        mb.showerror(
+            "Erro", "Por favor, insira uma quantidade e preço válidos.")
+        tela_add_produto()
+        return
 
-        mb.showinfo(
-            "Sucesso", f"'{nome}'({qtde}) Adicionado ao Estoque .")
+    mb.showinfo(
+        "Sucesso", f"'{nome}'({qtde}) Adicionado ao Estoque .")
 
-        if mb.askyesno("Adicionar outro produto", "Deseja adicionar outro produto?"):
-            tela_add_produto()
+    if mb.askyesno("Adicionar outro produto", "Deseja adicionar outro produto?"):
+        tela_add_produto()
 
 def salvar_edicao(id_produto, nome, qtde, preco):
     """
