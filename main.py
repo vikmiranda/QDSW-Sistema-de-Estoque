@@ -708,7 +708,8 @@ def editar_produto(tv):
             # Botão para salvar a edição
             botao_salvar = tkinter.Button(
                 editar_janela, text="Salvar", bg="#6B58FF", fg="white",
-                command=lambda: salvar_edicao(cursor, id_produto, nome.get(), qtde.get(), preco.get())
+                command=lambda: salvar_edicao(cursor, id_produto, nome.get(),
+                                              qtde.get(), preco.get())
             )
             botao_salvar.grid(row=4, column=1, padx=5, pady=10, sticky='ew')
 
