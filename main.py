@@ -625,23 +625,26 @@ def salvar_edicao(db_cursor, id_produto, nome, qtde, preco):
     except ValueError:
         return False
 
-def deletar_produtos(db_cursor, itens_para_deletar):
+def deletar_produtos(db_cursor, produto_para_deletar):
     """
     Deleta produtos do banco de dados.
 
     Args:
         db_cursor (sqlite3.Cursor): Cursor do banco de dados.
-        itens_para_deletar (list): Lista de tuplas contendo ID e nome do produto a ser deletado.
+        produto_para_deletar (list): Lista de tuplas contendo ID e nome do produto a ser deletado.
 
     Returns:
         bool: True se todos os itens forem deletados com sucesso, False em caso de erro.
     """
     try:
-        for id_produto, _ in itens_para_deletar:
+        for id_produto, _ in produto_para_deletar:
+            if not isinstance(id_produto, int):
+                raise ValueError(f"ID inválido: {id_produto}")
             db_cursor.execute("DELETE FROM Produtos WHERE id=?", (id_produto,))
         connection.commit()
         return True
-    except ValueError:
+    except ValueError as e:
+        print(f"Erro de validação: {e}")
         return False
 
 

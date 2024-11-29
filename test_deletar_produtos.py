@@ -44,10 +44,10 @@ class TestDeletarProdutos(unittest.TestCase):
         self.cursor.execute("SELECT * FROM Produtos WHERE id=1")
         self.assertIsNone(self.cursor.fetchone())  # Verifica que o produto foi deletado
 
-    def test_deletar_produtos_invalido(self):
-        """Testa a deleção com valores inválidos."""
-        itens_para_deletar = [('invalido', 'Produto Inexistente')]
-        resultado = deletar_produtos(self.cursor, itens_para_deletar)
+    def test_deletar_produtos_id_invalido(self):
+        """Testa a deleção com um ID inválido (não numérico)."""
+        itens_invalidos_para_deletar = [('invalido', 'Produto Inexistente')]
+        resultado = deletar_produtos(self.cursor, itens_invalidos_para_deletar)
         self.assertFalse(resultado)  # A função deve retornar False
 
     def test_deletar_produto_nao_existente(self):
@@ -55,6 +55,14 @@ class TestDeletarProdutos(unittest.TestCase):
         itens_para_deletar = [(999, 'Produto Inexistente')]
         resultado = deletar_produtos(self.cursor, itens_para_deletar)
         self.assertTrue(resultado)  # A deleção não gera erro, mas nada é deletado
+        self.cursor.execute("SELECT COUNT(*) FROM Produtos")
+        self.assertEqual(self.cursor.fetchone()[0], 3)  # Nenhum produto foi removido
+
+    def test_deletar_produtos_lista_vazia(self):
+        """Testa a deleção com uma lista vazia."""
+        itens_para_deletar = []
+        resultado = deletar_produtos(self.cursor, itens_para_deletar)
+        self.assertTrue(resultado)  # Nenhum erro deve ser gerado
         self.cursor.execute("SELECT COUNT(*) FROM Produtos")
         self.assertEqual(self.cursor.fetchone()[0], 3)  # Nenhum produto foi removido
 
